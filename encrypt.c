@@ -19,7 +19,7 @@
 #include <stdlib.h> // for strtol
 #include <string.h> //for strlen
 #include "aes.h"
-
+#include "trigger.h"
 int main(int argc, char *argv[]) {
 
     // Check the args validity
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         printf("Invalid number of arguments.\nUsage:\n./encrypt.run key text\n");
         return 1;
     }
-
+	trigger_init();
     if(strlen(argv[1]) != 32 || strlen(argv[2]) != 32) {
 
         printf("Invalid key/text size.\n");

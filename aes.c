@@ -34,7 +34,7 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 #include <stdint.h>
 #include <string.h> // CBC mode, for memset
 #include "aes.h"
-
+#include "trigger.h"
 /*****************************************************************************/
 /* Defines:                                                                  */
 /*****************************************************************************/
@@ -423,9 +423,12 @@ static void Cipher(state_t* state, uint8_t* RoundKey)
   
   // The last round is given below.
   // The MixColumns function is not here in the last round.
-  SubBytes(state);
+trigger_high();  
+SubBytes(state);
+trigger_low();
   ShiftRows(state);
   AddRoundKey(Nr, state, RoundKey);
+
 }
 
 static void InvCipher(state_t* state,uint8_t* RoundKey)
