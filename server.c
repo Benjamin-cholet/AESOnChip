@@ -9,7 +9,7 @@
 */
 
 #include <stdio.h> 
-#include <strings.h> 
+#include <string.h> 
 #include <sys/types.h> 
 #include <arpa/inet.h> 
 #include <sys/socket.h> 
@@ -66,12 +66,10 @@ int main(void) {
 
 				puts("Received plain text");
 				memcpy(text, buf+1, 16);
-
 			case 'g' :
 
 				puts("Received go command");
 				memcpy(cipher, text, 16);
-
 				AES_ECB_encrypt(&ctx, cipher);
 				break;
 			case 'c':
@@ -79,7 +77,6 @@ int main(void) {
 				puts("Received c command");
 				sendto(listenfd, cipher, 16, 0, 
 					(struct sockaddr*)&cliaddr, sizeof(cliaddr));
-
 				break;
 			case 'f' :
 
