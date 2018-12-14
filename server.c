@@ -17,47 +17,49 @@
 
 #include "aes.h"
 
-#define PORT 5000 
-#define BUFSIZE 1000 
-  
+#define PORT 5000
+#define BUFSIZE 1000
+
 int main(void) {  
 
-    uint8_t buf[BUFSIZE]; 
-    int8_t *message = "Hello Client"; 
-    int listenfd;
-    socklen_t len; 
-    struct sockaddr_in servaddr, cliaddr; 
-    bzero(&servaddr, sizeof(servaddr)); 
+	uint8_t buf[BUFSIZE]; 
+	int8_t ok_message[3] = {'o', 'k', '\0'};
+	int8_t hello_message[6] = {'H', 'E', 'L', 'L', 'O', '\0'};
+	int listenfd;
+	socklen_t len; 
+	struct sockaddr_in servaddr, cliaddr; 
+	bzero(&servaddr, sizeof(servaddr)); 
 
-    uint8_t key[16];
-    uint8_t text[16];
-    uint8_t cipher[16];
-    struct AES_ctx ctx;
-  
-    // Create a UDP Socket 
-    listenfd = socket(AF_INET, SOCK_DGRAM, 0);         
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
-    servaddr.sin_port = htons(PORT); 
-    servaddr.sin_family = AF_INET;  
-   
-    // bind server address to socket descriptor 
-    bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)); 
-        
-    // send the response 
+	uint8_t key[16];
+	uint8_t text[16];
+	uint8_t cipher[16];
+	struct AES_ctx ctx;
 
-    while(1) {
+	// Create a UDP Socket 
+	listenfd = socket(AF_INET, SOCK_DGRAM, 0);         
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+	servaddr.sin_port = htons(PORT); 
+	servaddr.sin_family = AF_INET;  
 
-	   	//receive the datagram 
-	    len = sizeof(cliaddr); 
-	    int n = recvfrom(listenfd, buf, sizeof(buf), 
-	            0, (struct sockaddr*)&cliaddr,&len); 
-	    
-	    switch(buf[0]) {
+	// bind server address to socket descriptor 
+	bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)); 
+		
+	// send the response 
 
-	    	case 'k' :
+	while(1) {
 
-	    		memset(&ctx, 0, sizeof(ctx));
-    		    AES_init_ctx(&ctx, buf+1);
+		//receive the datagram
+		memset(buf, 0, BUFSIZE);
+		len = sizeof(cliaddr); 
+		int n = recvfrom(listenfd, buf, sizeof(buf), 
+				0, (struct sockaddr*)&cliaddr,&len); 
+		
+		switch(buf[0]) {
+
+			case 'k' :
+
+				memset(&ctx, 0, sizeof(ctx));
+				AES_init_ctx(&ctx, buf+1);
 				puts("A new key has been set up successfully.\n");
 				break;
 			case 'p' :
@@ -70,33 +72,38 @@ int main(void) {
 				puts("Received go command");
 				memcpy(cipher, text, 16);
 
-		    	AES_ECB_encrypt(&ctx, cipher);
-			    break;
+				AES_ECB_encrypt(&ctx, cipher);
+				break;
 			case 'c':
 
 				puts("Received c command");
-			    sendto(listenfd, cipher, 16, 0, 
-          			(struct sockaddr*)&cliaddr, sizeof(cliaddr));
+				sendto(listenfd, cipher, 16, 0, 
+					(struct sockaddr*)&cliaddr, sizeof(cliaddr));
 
-			    break;
+				break;
 			case 'f' :
 
 				puts("Received 'f' command.\n");
 				memcpy(cipher, buf+1, 16);
-			    AES_ECB_encrypt(&ctx, cipher);
+				AES_ECB_encrypt(&ctx, cipher);
 
 				for(int i = 0; i<16; i++)
 					printf("%.2X", cipher[i]);
 				printf("\n");
 				break;
+			case 't' :
+
+				sendto(listenfd, ok_message, 3, 0, 
+				(struct sockaddr*)&cliaddr, sizeof(cliaddr));
+				break;
 			default:
 
 				break;
-	    }
+		}
 
-	    sendto(listenfd, message, BUFSIZE, 0, 
-          (struct sockaddr*)&cliaddr, sizeof(cliaddr)); 
-    }
+		sendto(listenfd, hello_message, 6, 0, 
+		(struct sockaddr*)&cliaddr, sizeof(cliaddr)); 
+	}
 
-    return 0;
-} 
+	return 0;
+}

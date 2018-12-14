@@ -1,5 +1,5 @@
 /*
-    Dummy UDP client
+	Dummy UDP client
 */
 
 #include <stdio.h> 
@@ -10,7 +10,7 @@
 #include<netinet/in.h> 
 #include<unistd.h> 
 #include<stdlib.h> 
-  
+
 #define SERVER_ADDR "127.0.0.1"
 #define PORT 5000 
 #define BUFSIZE 1000
@@ -24,62 +24,62 @@ const uint8_t test_msg[1] = {'t'};
 
 int main(int argc, char **argv) {
 
-    uint8_t buf[BUFSIZE]; 
-    int sockfd, n; 
-    struct sockaddr_in servaddr; 
-      
-    // clear servaddr 
-    memset(&servaddr, 0, sizeof(servaddr)); 
-    servaddr.sin_addr.s_addr = inet_addr(SERVER_ADDR); 
-    servaddr.sin_port = htons(PORT); 
-    servaddr.sin_family = AF_INET; 
-      
-    // create datagram socket 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0); 
-      
-    // connect to server 
-    if(connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+	uint8_t buf[BUFSIZE]; 
+	int sockfd, n; 
+	struct sockaddr_in servaddr; 
 
-        puts("\n Error : Connect Failed \n"); 
-        exit(0); 
-    } 
-  
-    // request to send datagram 
-    // no need to specify server address in sendto 
-    // connect stores the peers IP and port
+	// clear servaddr 
+	memset(&servaddr, 0, sizeof(servaddr)); 
+	servaddr.sin_addr.s_addr = inet_addr(SERVER_ADDR); 
+	servaddr.sin_port = htons(PORT); 
+	servaddr.sin_family = AF_INET; 
 
-    switch (argv[1][0]) {
+	// create datagram socket 
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0); 
 
-        case 'k':
+	// connect to server 
+	if(connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
 
-            sendto(sockfd, key_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;
-        case 'p' :
+		puts("\n Error : Connect Failed \n"); 
+		exit(0); 
+	}
 
-            sendto(sockfd, p_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;
+	// request to send datagram 
+	// no need to specify server address in sendto 
+	// connect stores the peers IP and port
 
-        case 'f' :
-            sendto(sockfd, fast_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;
-        case 'g' :
+	switch (argv[1][0]) {
 
-            sendto(sockfd, go_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;
-        case 'c' :
+		case 'k':
 
-            sendto(sockfd, cipher_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;
-        case 't' :
+			sendto(sockfd, key_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;
+		case 'p' :
 
-            sendto(sockfd, test_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
-            break;            
-    }
+			sendto(sockfd, p_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;
 
-    // waiting for response 
-    recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*)NULL, NULL); 
-    puts((char *)buf); 
-  
-    // close the descriptor 
-    close(sockfd); 
+		case 'f' :
+			sendto(sockfd, fast_msg, 17, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;
+		case 'g' :
+
+			sendto(sockfd, go_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;
+		case 'c' :
+
+			sendto(sockfd, cipher_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;
+		case 't' :
+
+			sendto(sockfd, test_msg, 1, 0, (struct sockaddr*)NULL, sizeof(servaddr)); 
+			break;            
+	}
+
+	// waiting for response 
+	recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*)NULL, NULL); 
+	puts((char *)buf); 
+
+	// close the descriptor 
+	close(sockfd); 
 } 
